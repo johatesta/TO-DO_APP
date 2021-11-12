@@ -1,6 +1,6 @@
 from django.db import models
 
-class Todo(models.model):
+class Todo(models.Model):
     tittle=models.CharField(max_length=120)
     description = models.TextField()
     completed=models.BooleanField(default=False)
