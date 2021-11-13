@@ -14,7 +14,7 @@ from django.views import View
 from django.shortcuts import redirect
 from django.db import transaction
 
-from .models import Task
+from .models import Folder, Task
 from .forms import PositionForm
 
 
@@ -86,7 +86,7 @@ class TaskUpdate(LoginRequiredMixin, UpdateView):
     success_url = reverse_lazy('tasks')
 
 
-class DeleteView(LoginRequiredMixin, DeleteView):
+class DeleteTask(LoginRequiredMixin, DeleteView):
     model = Task
     context_object_name = 'task'
     success_url = reverse_lazy('tasks')
@@ -105,3 +105,63 @@ class TaskReorder(View):
                 self.request.user.set_task_order(positionList)
 
         return redirect(reverse_lazy('tasks'))
+
+class FolderList(LoginRequiredMixin, ListView):
+    model = Folder
+    context_object_name = 'folder'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['folder'] = context['folder'].filter(user=self.request.user)
+
+        search_input = self.request.GET.get('search-area') or ''
+        if search_input:
+            context['folder'] = context['folder'].filter(
+                title__contains=search_input)
+
+        context['search_input'] = search_input
+
+        return context
+
+
+class FolderDetail(LoginRequiredMixin, DetailView):
+    model = Folder
+    context_object_name = 'folder'
+    template_name = 'base/folder.html'
+
+
+class FolderCreate(LoginRequiredMixin, CreateView):
+    model = Folder
+    fields = ['title']
+    success_url = reverse_lazy('folder')
+
+    def form_valid(self, form):
+        form.instance.user = self.request.user
+        return super(TaskCreate, self).form_valid(form)
+
+
+class FolderUpdate(LoginRequiredMixin, UpdateView):
+    model = Folder
+    fields = ['title']
+    success_url = reverse_lazy('folder')
+
+
+class DeleteView(LoginRequiredMixin, DeleteView):
+    model = Folder
+    context_object_name = 'folder'
+    success_url = reverse_lazy('folder')
+    def get_queryset(self):
+        owner = self.request.user
+        return self.model.objects.filter(user=owner)
+
+class FolderReorder(View):
+    def post(self, request):
+        form = PositionForm(request.POST)
+
+        if form.is_valid():
+            positionList = form.cleaned_data["position"].split(',')
+
+            with transaction.atomic():
+                self.request.user.set_task_order(positionList)
+
+        return redirect(reverse_lazy('folder'))
