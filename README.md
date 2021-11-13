@@ -1,4 +1,19 @@
-# Django-To-Do-list-with-user-authentication
-To Do list app with User Registration, Login, Search and full Create Read Update and DELETE functionality.
+# To Do App
 
-![DEMO](../master/Django%20To%20Do%20List%20App.jpg)
+App in django
+
+## Installation
+To run this app download this repository and in your bash insert the next command
+
+```bash
+pip install requirements.txt
+```
+
+## Usage
+Then run the server 
+with python manage.py runserver
+Login user= admin
+password= admin
+
+
+
