@@ -6,7 +6,7 @@ App in django
 To run this app download this repository and in your bash insert the next command
 
 ```bash
-pip install foobar
+pip install requirements.txt
 ```
 
 ## Usage
